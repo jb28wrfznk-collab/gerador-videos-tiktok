@@ -9,10 +9,7 @@ st.title("🚀 Gerador de Vídeos Curtos para E-commerce")
 try:
     GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 except Exception:
-    GEMINI_API_KEY = "AQ.Ab8RN6LcI7nRG_A1jsbnw46cezATpAbjCGrma8VmEsRVeTAFOA"
-else:
-    # Valor de segurança para testes locais
-    GEMINI_API_KEY = "AQ.Ab8RN6LcI7nRG_A1jsbnw46cezATpAbjCGrma8VmEsRVeTAFOA"
+    GEMINI_API_KEY = ""
 
 url_produto = st.text_input("Cole o link do produto do Mercado Livre ou da Shopee:")
 
