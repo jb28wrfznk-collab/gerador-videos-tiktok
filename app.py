@@ -2,90 +2,103 @@ import time
 import streamlit as st
 from google import genai
 
-st.set_page_config(page_title="Gerador de Vídeos TikTok", layout="centered")
+st.set_page_config(page_title="Gerador de Vídeos Curtos", layout="centered")
 st.title("🚀 Gerador de Vídeos Curtos para E-commerce")
 
-# Carrega a chave de forma segura a partir do Streamlit Secrets
+# Chave da API nos Secrets
 try:
     GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 except Exception:
     GEMINI_API_KEY = ""
 
-url_produto = st.text_input("Cole o link do produto do Mercado Livre ou da Shopee:")
+url_produto = st.text_input("Link do produto (Mercado Livre / Shopee):")
 
-# Controlos de personalização da geração em 3 colunas
+# Definições em 3 colunas
 col1, col2, col3 = st.columns(3)
 with col1:
     tom_voz = st.selectbox(
         "Tom do vídeo:",
         [
             "UGC Espontâneo (Recomendação natural)",
-            "Venda Direta (Comercial focado em urgência/oferta)",
-            "Curiosidade / Humor (Entretenimento com quebra de padrão)"
+            "Venda Direta (Urgência e foco em oferta)",
+            "Curiosidade / Humor (Quebra de padrão)"
         ]
     )
 with col2:
     duracao = st.selectbox(
         "Duração estimada:",
         [
-            "15 a 30 segundos (Rápido e direto ao ponto)",
-            "30 a 60 segundos (Mais detalhado com demonstração)"
+            "15 a 30 segundos (Rápido e direto)",
+            "30 a 60 segundos (Demonstração detalhada)"
         ]
     )
 with col3:
     objetivo_cta = st.selectbox(
         "Objetivo da Chamada (CTA):",
         [
-            "Comentar 'EU QUERO' (Automação de DM)",
+            "Comentar 'EU QUERO' (Automação DM)",
             "Clicar no link da Bio (Tráfego direto)",
-            "Partilhar / Marcar amigo (Viralização)"
+            "Partilhar com amigo (Viralização)"
         ]
     )
 
-# Campo opcional para ancoragem de preço ou cupão promocional
 preco_cupom = st.text_input(
-    "Preço promocional ou cupão de desconto (opcional):",
+    "Preço promocional ou cupão (opcional):",
     placeholder="Ex.: De R$ 89 por R$ 39,90 ou Cupão: VIRAL10"
 )
 
 if url_produto:
     if st.button("Gerar Roteiro Personalizado"):
-        with st.spinner("A analisar produto e a estruturar o conteúdo completo..."):
+        with st.spinner("A estruturar o conteúdo..."):
             client = genai.Client(api_key=GEMINI_API_KEY)
 
             contexto_oferta = (
-                f"- Oferta/Preço/Cupão: {preco_cupom} (destacar com forte ancoragem de valor e senso de urgência)"
+                f"- Oferta/Preço/Cupão: {preco_cupom} (destacar ancoragem e urgência)"
                 if preco_cupom
-                else "- Oferta: Sem valor explícito informado. Focar no valor percebido e benefícios práticos do produto."
+                else "- Sem valor explícito. Focar nos benefícios práticos."
             )
 
             prompt = f"""
-Analise este produto ou tipo de produto indicado pelo link: {url_produto}
+Analise o produto ou nicho indicado pelo link: {url_produto}
 
-Crie um pacote magnético de conversão em português para TikTok/Reels/Shorts com as seguintes especificações:
-- Tom de voz: {tom_voz}
-- Duração alvo: {duracao}
-- Foco da Chamada para Ação (CTA): {objetivo_cta}
+Crie um pacote de alta conversão em português para TikTok/Reels com:
+- Tom: {tom_voz}
+- Duração: {duracao}
+- Foco da CTA: {objetivo_cta}
 {contexto_oferta}
 
-Estrutura obrigatória da resposta:
-1. 🎣 3 OPÇÕES DE GANCHOS VISUAIS E AUDITIVOS (00:00 - 00:03) para Teste A/B:
-   - Opção A: Curiosidade Extrema (Quebra de padrão inicial)
-   - Opção B: Dor Real / Identificação Imediata (Problema urgente)
-   - Opção C: Contraintuitivo / Choque (Afirmação que desafia o senso comum)
-2. Desenvolvimento do Problema / Agitação da dor vivida pelo cliente.
-3. Demonstração Prática da Solução (qualidades visuais, benefícios chave e inserção do preço/cupão se fornecido).
-4. Chamada para Ação (CTA): Estritamente focada em: {objetivo_cta}.
-5. Bastidores de Gravação e Edição (ritmo de cortes secos, efeitos sonoros recomendados e texto dinâmico no ecrã).
-6. 📝 LEGENDA PRONTA PARA PUBLICAÇÃO:
-   - Texto magnético curto com gancho de leitura.
-   - Reforço do CTA escolhido.
-   - Bloco com 5 a 8 hashtags altamente estratégicas (misturando termos de e-commerce viral e nicho do produto).
+Utilize exatamente esta formatação com marcadores para separação:
+
+### [ROTEIRO_INICIO]
+1. 🎣 3 OPÇÕES DE GANCHOS (00:00 - 00:03) para Teste A/B:
+- Opção A (Curiosidade)
+- Opção B (Dor Real)
+- Opção C (Contraintuitivo)
+
+2. DESENVOLVIMENTO:
+- Agitação do problema
+- Demonstração visual da solução e inserção de oferta
+
+3. CHAMADA PARA AÇÃO (CTA):
+- Alinhada com: {objetivo_cta}
+### [ROTEIRO_FIM]
+
+### [LEGENDA_INICIO]
+- Texto magnético para descrição do post.
+- Reforço do CTA.
+- 5 a 8 hashtags virais e de nicho.
+### [LEGENDA_FIM]
+
+### [BASTIDORES_INICIO]
+- Ritmo de corte (jump cuts).
+- Efeitos sonoros sugeridos (SFX).
+- Instruções de texto/legendas dinâmicas no ecrã.
+### [BASTIDORES_FIM]
 """
 
-            roteiro_gerado = None
+            conteudo = None
             ultimo_erro = None
-            max_tentativas = 4
+            max_tentativas = 3
 
             for tentativa in range(max_tentativas):
                 try:
@@ -93,7 +106,7 @@ Estrutura obrigatória da resposta:
                         model="gemini-3.8-flash",
                         contents=prompt
                     )
-                    roteiro_gerado = response.text
+                    conteudo = response.text
                     break
                 except Exception as e:
                     ultimo_erro = e
@@ -102,15 +115,35 @@ Estrutura obrigatória da resposta:
                     else:
                         break
 
-            if roteiro_gerado:
-                st.success("Roteiro e legenda gerados com sucesso!")
+            if conteudo:
+                st.success("Conteúdo gerado com sucesso!")
+
+                # Extrai cada bloco pelos marcadores
+                def extrair(texto, tag_ini, tag_fim):
+                    try:
+                        return texto.split(tag_ini)[1].split(tag_fim)[0].strip()
+                    except Exception:
+                        return texto
+
+                tab_roteiro = extrair(conteudo, "### [ROTEIRO_INICIO]", "### [ROTEIRO_FIM]")
+                tab_legenda = extrair(conteudo, "### [LEGENDA_INICIO]", "### [LEGENDA_FIM]")
+                tab_bastidores = extrair(conteudo, "### [BASTIDORES_INICIO]", "### [BASTIDORES_FIM]")
+
+                # Apresentação visual limpa em separadores
+                t1, t2, t3 = st.tabs(["🎬 Roteiro & Ganchos", "📝 Legenda & Tags", "🛠️ Bastidores & Edição"])
+                with t1:
+                    st.markdown(tab_roteiro)
+                with t2:
+                    st.markdown(tab_legenda)
+                with t3:
+                    st.markdown(tab_bastidores)
+
                 st.markdown("---")
-                st.markdown(roteiro_gerado)
                 st.download_button(
-                    label="📥 Baixar Roteiro e Legenda (.txt)",
-                    data=roteiro_gerado,
-                    file_name="conteudo_video_completo.txt",
+                    label="📥 Baixar Pacote Completo (.txt)",
+                    data=conteudo.replace("### [ROTEIRO_INICIO]", "").replace("### [ROTEIRO_FIM]", "").replace("### [LEGENDA_INICIO]", "").replace("### [LEGENDA_FIM]", "").replace("### [BASTIDORES_INICIO]", "").replace("### [BASTIDORES_FIM]", ""),
+                    file_name="roteiro_completo.txt",
                     mime="text/plain"
                 )
             else:
-                st.error(f"Erro ao gerar o roteiro: {ultimo_erro}")
+                st.error(f"Não foi possível gerar. Detalhe: {ultimo_erro}")
