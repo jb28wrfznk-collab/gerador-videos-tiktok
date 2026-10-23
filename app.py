@@ -37,21 +37,21 @@ if url_produto:
     if st.button("Gerar Roteiro Personalizado"):
         with st.spinner("A analisar produto e a estruturar o roteiro..."):
             client = genai.Client(api_key=GEMINI_API_KEY)
-            
+
             prompt = f"""
-            Analise este produto ou tipo de produto indicado pelo link: {url_produto}
-            
-            Crie um roteiro magnético de vídeo curto em português para TikTok/Reels/Shorts com as seguintes especificações:
-            - Tom de voz: {tom_voz}
-            - Duração alvo: {duracao}
-            
-            Estrutura obrigatória do roteiro:
-            1. [00:00 - 00:03] Gancho Visual e Auditivo forte (Hook magnético para reter a atenção).
-            2. Dor / Problema real vivido pelo cliente.
-            3. Demonstração da Solução (apresentação prática das qualidades do produto).
-            4. Chamada para Ação (CTA) clara (ex: comentar para receber link, clicar na bio).
-            5. Dicas extras de bastidores (sugestão de áudio de fundo, ritmo de edição e efeitos visuais).
-            """
+Analise este produto ou tipo de produto indicado pelo link: {url_produto}
+
+Crie um roteiro magnético de vídeo curto em português para TikTok/Reels/Shorts com as seguintes especificações:
+- Tom de voz: {tom_voz}
+- Duração alvo: {duracao}
+
+Estrutura obrigatória do roteiro:
+1. [00:00 - 00:03] Gancho Visual e Auditivo forte (Hook magnético para reter a atenção).
+2. Dor / Problema real vivido pelo cliente.
+3. Demonstração da Solução (apresentação prática das qualidades do produto).
+4. Chamada para Ação (CTA) clara (ex: comentar para receber link, clicar na bio).
+5. Dicas extras de bastidores (sugestão de áudio de fundo, ritmo de edição e efeitos visuais).
+"""
 
             roteiro_gerado = None
             ultimo_erro = None
@@ -60,7 +60,7 @@ if url_produto:
             for tentativa in range(max_tentativas):
                 try:
                     response = client.models.generate_content(
-                        model="gemini-3.8-flash",
+                        model="gemini-2.0-flash",
                         contents=prompt
                     )
                     roteiro_gerado = response.text
@@ -76,9 +76,11 @@ if url_produto:
                 st.success("Roteiro personalizado gerado com sucesso!")
                 st.markdown("---")
                 st.markdown(roteiro_gerado)
-                st.markdown("---")
-                
-                st.subheader("📋 Copiar Roteiro")
-                st.text_area("Pode copiar o texto diretamente abaixo:", value=roteiro_gerado, height=240)
+                st.download_button(
+                    label="📥 Baixar Roteiro (.txt)",
+                    data=roteiro_gerado,
+                    file_name="roteiro_video.txt",
+                    mime="text/plain"
+                )
             else:
                 st.error(f"Erro ao gerar o roteiro: {ultimo_erro}")
