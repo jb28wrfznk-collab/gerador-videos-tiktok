@@ -42,10 +42,22 @@ with col3:
         ]
     )
 
+# Campo opcional para ancoragem de preço ou cupão promocional
+preco_cupom = st.text_input(
+    "Preço promocional ou cupão de desconto (opcional):",
+    placeholder="Ex.: De R$ 89 por R$ 39,90 ou Cupão: VIRAL10"
+)
+
 if url_produto:
     if st.button("Gerar Roteiro Personalizado"):
         with st.spinner("A analisar produto e a estruturar o roteiro..."):
             client = genai.Client(api_key=GEMINI_API_KEY)
+
+            contexto_oferta = (
+                f"- Oferta/Preço/Cupão: {preco_cupom} (destacar com forte ancoragem de valor e senso de urgência)"
+                if preco_cupom
+                else "- Oferta: Sem valor explícito informado. Focar no valor percebido e benefícios práticos do produto."
+            )
 
             prompt = f"""
 Analise este produto ou tipo de produto indicado pelo link: {url_produto}
@@ -54,6 +66,7 @@ Crie um roteiro magnético de vídeo curto em português para TikTok/Reels/Short
 - Tom de voz: {tom_voz}
 - Duração alvo: {duracao}
 - Foco da Chamada para Ação (CTA): {objetivo_cta}
+{contexto_oferta}
 
 Estrutura obrigatória do roteiro:
 1. 🎣 3 OPÇÕES DE GANCHOS VISUAIS E AUDITIVOS (00:00 - 00:03) para Teste A/B:
@@ -61,9 +74,9 @@ Estrutura obrigatória do roteiro:
    - Opção B: Dor Real / Identificação Imediata (Problema urgente)
    - Opção C: Contraintuitivo / Choque (Afirmação que desafia o senso comum)
 2. Desenvolvimento do Problema / Agitação da dor vivida pelo cliente.
-3. Demonstração Prática da Solução (qualidades visuais e benefícios chave do produto).
+3. Demonstração Prática da Solução (qualidades visuais, benefícios chave e inserção natural do preço/cupão se fornecido).
 4. Chamada para Ação (CTA): Estritamente focada em: {objetivo_cta}.
-5. Bastidores de Gravação e Edição (sugestão de ritmo de cortes rápidos, efeito sonoro e texto dinâmico na tela).
+5. Bastidores de Gravação e Edição (sugestão de ritmo de cortes rápidos, efeito sonoro e texto dinâmico no ecrã).
 """
 
             roteiro_gerado = None
