@@ -60,7 +60,7 @@ Estrutura obrigatória do roteiro:
             for tentativa in range(max_tentativas):
                 try:
                     response = client.models.generate_content(
-                        model="gemini-2.0-flash",
+                        model="gemini-3.8-flash",
                         contents=prompt
                     )
                     roteiro_gerado = response.text
