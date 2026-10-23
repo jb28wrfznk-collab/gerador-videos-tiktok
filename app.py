@@ -50,7 +50,7 @@ preco_cupom = st.text_input(
 
 if url_produto:
     if st.button("Gerar Roteiro Personalizado"):
-        with st.spinner("A analisar produto e a estruturar o roteiro..."):
+        with st.spinner("A analisar produto e a estruturar o conteúdo completo..."):
             client = genai.Client(api_key=GEMINI_API_KEY)
 
             contexto_oferta = (
@@ -62,21 +62,25 @@ if url_produto:
             prompt = f"""
 Analise este produto ou tipo de produto indicado pelo link: {url_produto}
 
-Crie um roteiro magnético de vídeo curto em português para TikTok/Reels/Shorts com as seguintes especificações:
+Crie um pacote magnético de conversão em português para TikTok/Reels/Shorts com as seguintes especificações:
 - Tom de voz: {tom_voz}
 - Duração alvo: {duracao}
 - Foco da Chamada para Ação (CTA): {objetivo_cta}
 {contexto_oferta}
 
-Estrutura obrigatória do roteiro:
+Estrutura obrigatória da resposta:
 1. 🎣 3 OPÇÕES DE GANCHOS VISUAIS E AUDITIVOS (00:00 - 00:03) para Teste A/B:
    - Opção A: Curiosidade Extrema (Quebra de padrão inicial)
    - Opção B: Dor Real / Identificação Imediata (Problema urgente)
    - Opção C: Contraintuitivo / Choque (Afirmação que desafia o senso comum)
 2. Desenvolvimento do Problema / Agitação da dor vivida pelo cliente.
-3. Demonstração Prática da Solução (qualidades visuais, benefícios chave e inserção natural do preço/cupão se fornecido).
+3. Demonstração Prática da Solução (qualidades visuais, benefícios chave e inserção do preço/cupão se fornecido).
 4. Chamada para Ação (CTA): Estritamente focada em: {objetivo_cta}.
-5. Bastidores de Gravação e Edição (sugestão de ritmo de cortes rápidos, efeito sonoro e texto dinâmico no ecrã).
+5. Bastidores de Gravação e Edição (ritmo de cortes secos, efeitos sonoros recomendados e texto dinâmico no ecrã).
+6. 📝 LEGENDA PRONTA PARA PUBLICAÇÃO:
+   - Texto magnético curto com gancho de leitura.
+   - Reforço do CTA escolhido.
+   - Bloco com 5 a 8 hashtags altamente estratégicas (misturando termos de e-commerce viral e nicho do produto).
 """
 
             roteiro_gerado = None
@@ -99,13 +103,13 @@ Estrutura obrigatória do roteiro:
                         break
 
             if roteiro_gerado:
-                st.success("Roteiro personalizado gerado com sucesso!")
+                st.success("Roteiro e legenda gerados com sucesso!")
                 st.markdown("---")
                 st.markdown(roteiro_gerado)
                 st.download_button(
-                    label="📥 Baixar Roteiro (.txt)",
+                    label="📥 Baixar Roteiro e Legenda (.txt)",
                     data=roteiro_gerado,
-                    file_name="roteiro_video.txt",
+                    file_name="conteudo_video_completo.txt",
                     mime="text/plain"
                 )
             else:
