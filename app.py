@@ -56,11 +56,14 @@ Crie um roteiro magnético de vídeo curto em português para TikTok/Reels/Short
 - Foco da Chamada para Ação (CTA): {objetivo_cta}
 
 Estrutura obrigatória do roteiro:
-1. [00:00 - 00:03] Gancho Visual e Auditivo forte (Hook magnético para reter a atenção).
-2. Dor / Problema real vivido pelo cliente.
-3. Demonstração da Solução (apresentação prática das qualidades do produto).
-4. Chamada para Ação (CTA) estritamente alinhada com: {objetivo_cta}.
-5. Dicas extras de bastidores (sugestão de áudio de fundo, ritmo de edição e efeitos visuais).
+1. 🎣 3 OPÇÕES DE GANCHOS VISUAIS E AUDITIVOS (00:00 - 00:03) para Teste A/B:
+   - Opção A: Curiosidade Extrema (Quebra de padrão inicial)
+   - Opção B: Dor Real / Identificação Imediata (Problema urgente)
+   - Opção C: Contraintuitivo / Choque (Afirmação que desafia o senso comum)
+2. Desenvolvimento do Problema / Agitação da dor vivida pelo cliente.
+3. Demonstração Prática da Solução (qualidades visuais e benefícios chave do produto).
+4. Chamada para Ação (CTA): Estritamente focada em: {objetivo_cta}.
+5. Bastidores de Gravação e Edição (sugestão de ritmo de cortes rápidos, efeito sonoro e texto dinâmico na tela).
 """
 
             roteiro_gerado = None
