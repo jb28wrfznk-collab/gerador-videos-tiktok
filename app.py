@@ -13,8 +13,8 @@ except Exception:
 
 url_produto = st.text_input("Cole o link do produto do Mercado Livre ou da Shopee:")
 
-# Controlos de personalização da geração
-col1, col2 = st.columns(2)
+# Controlos de personalização da geração em 3 colunas
+col1, col2, col3 = st.columns(3)
 with col1:
     tom_voz = st.selectbox(
         "Tom do vídeo:",
@@ -32,6 +32,15 @@ with col2:
             "30 a 60 segundos (Mais detalhado com demonstração)"
         ]
     )
+with col3:
+    objetivo_cta = st.selectbox(
+        "Objetivo da Chamada (CTA):",
+        [
+            "Comentar 'EU QUERO' (Automação de DM)",
+            "Clicar no link da Bio (Tráfego direto)",
+            "Partilhar / Marcar amigo (Viralização)"
+        ]
+    )
 
 if url_produto:
     if st.button("Gerar Roteiro Personalizado"):
@@ -44,12 +53,13 @@ Analise este produto ou tipo de produto indicado pelo link: {url_produto}
 Crie um roteiro magnético de vídeo curto em português para TikTok/Reels/Shorts com as seguintes especificações:
 - Tom de voz: {tom_voz}
 - Duração alvo: {duracao}
+- Foco da Chamada para Ação (CTA): {objetivo_cta}
 
 Estrutura obrigatória do roteiro:
 1. [00:00 - 00:03] Gancho Visual e Auditivo forte (Hook magnético para reter a atenção).
 2. Dor / Problema real vivido pelo cliente.
 3. Demonstração da Solução (apresentação prática das qualidades do produto).
-4. Chamada para Ação (CTA) clara (ex: comentar para receber link, clicar na bio).
+4. Chamada para Ação (CTA) estritamente alinhada com: {objetivo_cta}.
 5. Dicas extras de bastidores (sugestão de áudio de fundo, ritmo de edição e efeitos visuais).
 """
 
