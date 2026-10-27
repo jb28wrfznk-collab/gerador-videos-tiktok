@@ -5,13 +5,22 @@ from google import genai
 st.set_page_config(page_title="Gerador de Vídeos Curtos", layout="centered")
 st.title("🚀 Gerador de Vídeos Curtos para E-commerce")
 
+# Inicialização de estado para limpeza de campos
+if "url_produto" not in st.session_state:
+    st.session_state["url_produto"] = ""
+if "preco_cupom" not in st.session_state:
+    st.session_state["preco_cupom"] = ""
+
 # Chave da API nos Secrets
 try:
     GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
 except Exception:
     GEMINI_API_KEY = ""
 
-url_produto = st.text_input("Link do produto (Mercado Livre / Shopee):")
+url_produto = st.text_input(
+    "Link do produto (Mercado Livre / Shopee):",
+    key="url_produto"
+)
 
 # Definições em 3 colunas
 col1, col2, col3 = st.columns(3)
@@ -44,21 +53,31 @@ with col3:
 
 preco_cupom = st.text_input(
     "Preço promocional ou cupão (opcional):",
-    placeholder="Ex.: De R$ 89 por R$ 39,90 ou Cupão: VIRAL10"
+    placeholder="Ex.: De R$ 89 por R$ 39,90 ou Cupão: VIRAL10",
+    key="preco_cupom"
 )
 
-if url_produto:
-    if st.button("Gerar Roteiro Personalizado"):
-        with st.spinner("A estruturar o conteúdo..."):
-            client = genai.Client(api_key=GEMINI_API_KEY)
+# Botões de ação em 2 colunas
+btn_col1, btn_col2 = st.columns([3, 1])
+with btn_col1:
+    executar = st.button("🚀 Gerar Roteiro Personalizado", use_container_width=True)
+with btn_col2:
+    if st.button("🗑️ Limpar", use_container_width=True):
+        st.session_state["url_produto"] = ""
+        st.session_state["preco_cupom"] = ""
+        st.rerun()
 
-            contexto_oferta = (
-                f"- Oferta/Preço/Cupão: {preco_cupom} (destacar ancoragem e urgência)"
-                if preco_cupom
-                else "- Sem valor explícito. Focar nos benefícios práticos."
-            )
+if url_produto and executar:
+    with st.spinner("A estruturar o conteúdo..."):
+        client = genai.Client(api_key=GEMINI_API_KEY)
 
-            prompt = f"""
+        contexto_oferta = (
+            f"- Oferta/Preço/Cupão: {preco_cupom} (destacar ancoragem e urgência)"
+            if preco_cupom
+            else "- Sem valor explícito. Focar nos benefícios práticos."
+        )
+
+        prompt = f"""
 Analise o produto ou nicho indicado pelo link: {url_produto}
 
 Crie um pacote de alta conversão em português para TikTok/Reels com:
@@ -96,55 +115,53 @@ Utilize exatamente esta formatação com marcadores para separação:
 ### [BASTIDORES_FIM]
 """
 
-            conteudo = None
-            ultimo_erro = None
-            max_tentativas = 3
+        conteudo = None
+        ultimo_erro = None
+        max_tentativas = 4
 
-            for tentativa in range(max_tentativas):
-                try:
-                    response = client.models.generate_content(
-                        model="gemini-3.8-flash",
-                        contents=prompt
-                    )
-                    conteudo = response.text
-                    break
-                except Exception as e:
-                    ultimo_erro = e
-                    if "503" in str(e) and tentativa < max_tentativas - 1:
-                        time.sleep(3)
-                    else:
-                        break
-
-            if conteudo:
-                st.success("Conteúdo gerado com sucesso!")
-
-                # Extrai cada bloco pelos marcadores
-                def extrair(texto, tag_ini, tag_fim):
-                    try:
-                        return texto.split(tag_ini)[1].split(tag_fim)[0].strip()
-                    except Exception:
-                        return texto
-
-                tab_roteiro = extrair(conteudo, "### [ROTEIRO_INICIO]", "### [ROTEIRO_FIM]")
-                tab_legenda = extrair(conteudo, "### [LEGENDA_INICIO]", "### [LEGENDA_FIM]")
-                tab_bastidores = extrair(conteudo, "### [BASTIDORES_INICIO]", "### [BASTIDORES_FIM]")
-
-               # Apresentação visual limpa em separadores com cópia rápida
-                t1, t2, t3 = st.tabs(["🎬 Roteiro & Ganchos", "📝 Legenda & Tags", "🛠️ Bastidores & Edição"])
-                with t1:
-                    st.markdown(tab_roteiro)
-                with t2:
-                    st.caption("Clique no ícone do canto superior direito da caixa para copiar:")
-                    st.code(tab_legenda, language=None)
-                with t3:
-                    st.markdown(tab_bastidores)
-
-                st.markdown("---")
-                st.download_button(
-                    label="📥 Baixar Pacote Completo (.txt)",
-                    data=conteudo.replace("### [ROTEIRO_INICIO]", "").replace("### [ROTEIRO_FIM]", "").replace("### [LEGENDA_INICIO]", "").replace("### [LEGENDA_FIM]", "").replace("### [BASTIDORES_INICIO]", "").replace("### [BASTIDORES_FIM]", ""),
-                    file_name="roteiro_completo.txt",
-                    mime="text/plain"
+        for tentativa in range(max_tentativas):
+            try:
+                response = client.models.generate_content(
+                    model="gemini-3.8-flash",
+                    contents=prompt
                 )
-            else:
-                st.error(f"Não foi possível gerar. Detalhe: {ultimo_erro}")
+                conteudo = response.text
+                break
+            except Exception as e:
+                ultimo_erro = e
+                if "503" in str(e) and tentativa < max_tentativas - 1:
+                    time.sleep(3)
+                else:
+                    break
+
+        if conteudo:
+            st.success("Conteúdo gerado com sucesso!")
+
+            def extrair(texto, tag_ini, tag_fim):
+                try:
+                    return texto.split(tag_ini)[1].split(tag_fim)[0].strip()
+                except Exception:
+                    return texto
+
+            tab_roteiro = extrair(conteudo, "### [ROTEIRO_INICIO]", "### [ROTEIRO_FIM]")
+            tab_legenda = extrair(conteudo, "### [LEGENDA_INICIO]", "### [LEGENDA_FIM]")
+            tab_bastidores = extrair(conteudo, "### [BASTIDORES_INICIO]", "### [BASTIDORES_FIM]")
+
+            t1, t2, t3 = st.tabs(["🎬 Roteiro & Ganchos", "📝 Legenda & Tags", "🛠️ Bastidores & Edição"])
+            with t1:
+                st.markdown(tab_roteiro)
+            with t2:
+                st.caption("Clique no ícone de cópia no canto superior direito do bloco:")
+                st.code(tab_legenda, language=None)
+            with t3:
+                st.markdown(tab_bastidores)
+
+            st.markdown("---")
+            st.download_button(
+                label="📥 Baixar Pacote Completo (.txt)",
+                data=conteudo.replace("### [ROTEIRO_INICIO]", "").replace("### [ROTEIRO_FIM]", "").replace("### [LEGENDA_INICIO]", "").replace("### [LEGENDA_FIM]", "").replace("### [BASTIDORES_INICIO]", "").replace("### [BASTIDORES_FIM]", ""),
+                file_name="roteiro_completo.txt",
+                mime="text/plain"
+            )
+        else:
+            st.error(f"Erro ao processar: {ultimo_erro}")
