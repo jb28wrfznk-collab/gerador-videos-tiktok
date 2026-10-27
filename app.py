@@ -129,12 +129,13 @@ Utilize exatamente esta formatação com marcadores para separação:
                 tab_legenda = extrair(conteudo, "### [LEGENDA_INICIO]", "### [LEGENDA_FIM]")
                 tab_bastidores = extrair(conteudo, "### [BASTIDORES_INICIO]", "### [BASTIDORES_FIM]")
 
-                # Apresentação visual limpa em separadores
+               # Apresentação visual limpa em separadores com cópia rápida
                 t1, t2, t3 = st.tabs(["🎬 Roteiro & Ganchos", "📝 Legenda & Tags", "🛠️ Bastidores & Edição"])
                 with t1:
                     st.markdown(tab_roteiro)
                 with t2:
-                    st.markdown(tab_legenda)
+                    st.caption("Clique no ícone do canto superior direito da caixa para copiar:")
+                    st.code(tab_legenda, language=None)
                 with t3:
                     st.markdown(tab_bastidores)
 
