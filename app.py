@@ -5,10 +5,15 @@ from google import genai
 st.set_page_config(page_title="Gerador de Vídeos Curtos", layout="centered")
 st.title("🚀 Gerador de Vídeos Curtos para E-commerce")
 
-# Inicialização de estado para limpeza de campos
+# Inicialização de estado
 if "url_produto" not in st.session_state:
     st.session_state["url_produto"] = ""
 if "preco_cupom" not in st.session_state:
+    st.session_state["preco_cupom"] = ""
+
+# Função de limpeza executada antes da renderização
+def limpar_campos():
+    st.session_state["url_produto"] = ""
     st.session_state["preco_cupom"] = ""
 
 # Chave da API nos Secrets
@@ -62,10 +67,7 @@ btn_col1, btn_col2 = st.columns([3, 1])
 with btn_col1:
     executar = st.button("🚀 Gerar Roteiro Personalizado", use_container_width=True)
 with btn_col2:
-    if st.button("🗑️ Limpar", use_container_width=True):
-        st.session_state["url_produto"] = ""
-        st.session_state["preco_cupom"] = ""
-        st.rerun()
+    st.button("🗑️ Limpar", on_click=limpar_campos, use_container_width=True)
 
 if url_produto and executar:
     with st.spinner("A estruturar o conteúdo..."):
